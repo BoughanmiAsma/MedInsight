@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  kong-db:
+    image: postgres:15
+    container_name: kong-db
+    environment:
+      POSTGRES_DB: kong
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kong
+    volumes:
+      - kong-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  kong-migrations:
+    image: kong:3.6
+    command: "kong migrations bootstrap"
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-db
+      KONG_PG_PASSWORD: kong
+      KONG_PASSWORD: admin
+    depends_on:
+      - kong-db
+
+  kong:
+    image: kong:3.6
+    container_name: kong
+    restart: always
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-db
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+      KONG_PASSWORD: admin
+      
+      # Mode declaratif : charger ton fichier kong.yaml
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yaml
+
+      # Ports
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+
+    ports:
+      - "8000:8000"   # Gateway API
+      - "8001:8001"   # Admin API
+
+    volumes:
+      - ./kong.yaml:/usr/local/kong/declarative/kong.yaml:ro
+
+    depends_on:
+      - kong-db
+      - kong-migrations
+
+volumes:
+  kong-db-data:
