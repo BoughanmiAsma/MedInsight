@@ -1,7 +1,8 @@
 _format_version: "3.0"
 services:
   - name: Staff-service
-    url: http://Staff-service:9002
+    url: http://host.docker.internal:9002
+
     routes:
       - name: Staff-service
         paths:
