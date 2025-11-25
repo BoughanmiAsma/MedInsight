@@ -1,0 +1,47 @@
+<#-- Thème de connexion personnalisé MedInsight -->
+<#macro registrationSocial providers>
+    <#if providers??>
+        <div class="social-providers">
+            <#list providers as provider>
+                <a href="${provider.loginUrl}" class="btn btn-social btn-${provider.alias}">
+                    <i class="fa fa-${provider.alias}"></i>
+                    ${provider.displayName!}
+                </a>
+            </#list>
+        </div>
+    </#if>
+</#macro>
+
+<#macro loginForm>
+    <form id="kc-form-login" action="${url.loginAction}" method="post">
+        <div class="form-group">
+            <label for="username">Email ou nom d'utilisateur</label>
+            <input type="text" id="username" name="username" class="form-control"
+                   autofocus autocomplete="username" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" class="form-control"
+                   autocomplete="current-password" />
+        </div>
+
+        <#if message?has_content && (message.type != 'success')>
+            <div class="alert alert-${message.type}">
+                ${message.summary}
+            </div>
+        </#if>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-block">
+                Se connecter
+            </button>
+        </div>
+
+        <div class="form-links">
+            <#if realm.resetPasswordAllowed>
+                <a href="${url.loginResetCredentialsUrl}">Mot de passe oublié ?</a>
+            </#if>
+        </div>
+    </form>
+</#macro>

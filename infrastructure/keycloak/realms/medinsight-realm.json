@@ -1,0 +1,157 @@
+{
+  "realm": "medinsight",
+  "enabled": true,
+  "displayName": "MedInsight Health System",
+  "displayNameHtml": "<div class=\"kc-logo-text\"><span>MedInsight</span></div>",
+
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": true,
+  "editUsernameAllowed": false,
+  "resetPasswordAllowed": true,
+
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+
+  "sslRequired": "external",
+  "accessTokenLifespan": 300,
+  "refreshTokenLifespan": 1800,
+  "ssoSessionMaxLifespan": 36000,
+
+  "clients": [
+    {
+      "clientId": "identity-service",
+      "name": "Identity Service",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "${env.IDENTITY_SERVICE_SECRET}",
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "attributes": {
+        "access.token.lifespan": "300",
+        "use.refresh.tokens": "true"
+      },
+      "redirectUris": [
+        "http://localhost:8081/*",
+        "https://api.medinsight.local/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8081",
+        "https://api.medinsight.local"
+      ]
+    },
+    {
+      "clientId": "kong-api-gateway",
+      "name": "Kong API Gateway",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "${env.KONG_CLIENT_SECRET}",
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true
+    }
+  ],
+
+  "roles": {
+    "realm": [
+      {
+        "name": "medecin",
+        "description": "Médecin - Accès aux dossiers patients et consultations"
+      },
+      {
+        "name": "gestionnaire",
+        "description": "Gestionnaire de service - Accès aux statistiques et rapports"
+      },
+      {
+        "name": "responsable_securite",
+        "description": "Responsable sécurité - Accès complet aux logs et audit"
+      },
+      {
+        "name": "administrateur",
+        "description": "Administrateur système - Gestion des utilisateurs et configuration"
+      },
+      {
+        "name": "patient",
+        "description": "Patient - Accès à son propre dossier médical"
+      }
+    ]
+  },
+
+  "groups": [
+    {
+      "name": "Personnel Medical",
+      "realmRoles": ["medecin"]
+    },
+    {
+      "name": "Personnel Administratif",
+      "realmRoles": ["gestionnaire"]
+    },
+    {
+      "name": "Equipe Securite",
+      "realmRoles": ["responsable_securite", "administrateur"]
+    }
+  ],
+
+  "users": [
+    {
+      "username": "dr.dupont@medinsight.local",
+      "email": "dr.dupont@medinsight.local",
+      "firstName": "Jean",
+      "lastName": "Dupont",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Medecin123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["medecin"],
+      "groups": ["Personnel Medical"]
+    },
+    {
+      "username": "security.admin@medinsight.local",
+      "email": "security.admin@medinsight.local",
+      "firstName": "Alice",
+      "lastName": "Martin",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "SecurityAdmin456!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["responsable_securite", "administrateur"],
+      "groups": ["Equipe Securite"]
+    }
+  ],
+
+  "defaultRoles": ["patient"],
+
+  "requiredCredentials": ["password"],
+
+  "passwordPolicy": "length(8) and digits(1) and upperCase(1) and lowerCase(1) and specialChars(1)",
+
+  "bruteForceProtected": true,
+
+  "eventsEnabled": true,
+  "eventsListeners": ["jboss-logging"],
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR",
+    "REGISTER",
+    "LOGOUT",
+    "UPDATE_PROFILE",
+    "UPDATE_PASSWORD",
+    "DELETE_ACCOUNT"
+  ],
+  "eventsExpiration": 604800,
+
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true
+}
