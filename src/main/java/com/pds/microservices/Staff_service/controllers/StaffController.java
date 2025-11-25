@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class StaffController {
 
     // POST: Créer un nouveau staff
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StaffDTO> createStaff(@Valid @RequestBody StaffDTO staffDTO) {
         log.info("Requête POST: Création d'un nouveau staff");
         StaffDTO createdStaff = staffService.createStaff(staffDTO);
@@ -31,6 +33,7 @@ public class StaffController {
 
     // GET: Récupérer tous les staffs
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<List<StaffDTO>> getAllStaff() {
         log.info("Requête GET: Récupération de tous les staffs");
         List<StaffDTO> staffs = staffService.getAllStaff();
